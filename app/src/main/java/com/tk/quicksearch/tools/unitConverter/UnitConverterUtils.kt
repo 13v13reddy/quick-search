@@ -582,17 +582,22 @@ object UnitConverterUtils {
     }
 
     private fun parseExplicitQuery(query: String): ParsedQuery? {
-        val separatorMatch = separatorRegex.find(query) ?: return null
-        val left = query.substring(0, separatorMatch.range.first).trim()
-        val right = query.substring(separatorMatch.range.last + 1).trim()
-        if (left.isEmpty() || right.isEmpty()) return null
+        // "in" is also the inch unit ("10 in to cm"), so try each separator until both sides are units.
+        for (separatorMatch in separatorRegex.findAll(query)) {
+            val left = query.substring(0, separatorMatch.range.first).trim()
+            val right = query.substring(separatorMatch.range.last + 1).trim()
+            if (left.isEmpty() || right.isEmpty()) continue
 
-        val parsedLeft = parseAmountAndUnit(left) ?: return null
-        return ParsedQuery(
-            amount = parsedLeft.first,
-            fromUnitRaw = parsedLeft.second,
-            toUnitRaw = right,
-        )
+            val parsedLeft = parseAmountAndUnit(left) ?: continue
+            if (normalizeUnit(parsedLeft.second) !in unitsByAlias) continue
+            if (normalizeUnit(right) !in unitsByAlias) continue
+            return ParsedQuery(
+                amount = parsedLeft.first,
+                fromUnitRaw = parsedLeft.second,
+                toUnitRaw = right,
+            )
+        }
+        return null
     }
 
     private fun parseCommonShorthandQuery(query: String): ParsedQuery? {

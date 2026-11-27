@@ -63,4 +63,12 @@ class UnitConverterUtilsTest {
         assertEquals("340.19 grams (g)", UnitConverterUtils.convertQuery("12oz"))
         assertEquals("7.57 litres (L)", UnitConverterUtils.convertQuery("2gal"))
     }
+
+    @Test
+    fun convertsFromInchesWrittenAsIn() {
+        assertEquals("25.4 centimetres (cm)", UnitConverterUtils.convertQuery("10 in to cm"))
+        assertEquals("0.17 feet (ft)", UnitConverterUtils.convertQuery("2 in to ft"))
+        assertEquals("12.7 centimetres (cm)", UnitConverterUtils.convertQuery("5 in in cm"))
+        assertEquals("39.37 inches (in)", UnitConverterUtils.convertQuery("100 cm in in"))
+    }
 }
